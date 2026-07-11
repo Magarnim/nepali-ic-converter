@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NPR to IC Converter</title>
+  <style>
+    :root{--ink:#18233a;--muted:#667085;--paper:#fff;--back:#f5f7fb;--blue:#2f65d9;--blue2:#204ba9;--line:#dde4f0}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 10% 5%,#dce8ff 0,transparent 30%),var(--back);font-family:system-ui,-apple-system,sans-serif;color:var(--ink)}main{width:min(100%,750px)}header{text-align:center;margin-bottom:20px}h1{margin:0;font-size:clamp(1.55rem,4vw,2.25rem);letter-spacing:-.04em}header p{color:var(--muted);margin:8px 0 0}.card{background:var(--paper);border:1px solid #e7ebf3;border-radius:22px;box-shadow:0 14px 45px #20315a14;padding:clamp(20px,5vw,38px)}.rate{display:flex;align-items:end;gap:12px;background:#eef4ff;border:1px solid #d9e6ff;border-radius:14px;padding:13px 15px;margin-bottom:25px}label{display:block;font-size:.9rem;color:var(--muted);font-weight:650;margin-bottom:7px}.rate label{flex:1;margin:0}input{width:100%;border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--ink);font:inherit;font-size:1.08rem;outline:none;transition:.18s}input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2f65d922}.rate input{margin-top:7px;background:#fff}.grid{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:end}.swap{border:0;border-radius:50%;width:46px;height:46px;background:#e9f0ff;color:var(--blue2);font-size:1.45rem;cursor:pointer;transition:.18s;margin-bottom:2px}.swap:hover{transform:rotate(180deg);background:#d9e6ff}.result{margin-top:25px;padding:22px;text-align:center;background:linear-gradient(135deg,#255acd,#3d78e8);color:#fff;border-radius:16px}.result small{display:block;opacity:.82;font-weight:650}#answer{font-size:clamp(1.75rem,5vw,2.7rem);font-weight:800;margin-top:6px;word-break:break-word}.hint{margin:19px 0 0;text-align:center;color:var(--muted);font-size:.88rem}.ledger{margin-top:26px;border-top:1px solid var(--line);padding-top:23px}.ledger h2{font-size:1.1rem;margin:0 0 13px}.entry-fields{display:grid;grid-template-columns:1fr 1fr 150px;gap:12px;margin-bottom:14px}.ledger-actions{display:flex;gap:10px;flex-wrap:wrap}button.action{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:720;cursor:pointer;color:#fff;background:var(--blue)}button.minus{background:#c53e4b}button.clear{color:var(--ink);background:#edf0f5}.total{margin-top:16px;background:#f6f8fc;padding:15px;border-radius:12px;font-weight:720;display:flex;justify-content:space-between;gap:14px}.entries{width:100%;border-collapse:collapse;margin-top:17px;font-size:.9rem}.entries th{color:var(--muted);text-align:left;font-size:.8rem;padding:9px 7px;border-bottom:1px solid var(--line)}.entries td{padding:10px 7px;border-bottom:1px solid #edf0f5}.entries .add-row{color:#16824b;font-weight:700}.entries .minus-row{color:#c53e4b;font-weight:700}@media(max-width:560px){.entry-fields,.grid{grid-template-columns:1fr}.entries{font-size:.78rem}.entries th,.entries td{padding:8px 3px}.swap{justify-self:center;transform:rotate(90deg);margin:0}.swap:hover{transform:rotate(270deg)}}
+  </style>
+</head>
+<body>
+<main>
+  <header><h1>NPR <-> IC Converter</h1><p>Quick currency conversion and account tracking</p></header>
+  <section class="card" aria-label="Currency converter">
+    <div class="rate"><label for="rate">1 IC equals NPR<input id="rate" type="number" min="0" step="0.0001" value="1.60" inputmode="decimal"></label></div>
+    <div class="grid">
+      <div><label id="fromLabel" for="from">Nepalese Rupees (NPR)</label><input id="from" type="number" min="0" step="any" placeholder="Enter amount" inputmode="decimal" autofocus></div>
+      <button class="swap" id="swap" type="button" title="Switch conversion direction" aria-label="Switch conversion direction">&#8646;</button>
+      <div><label id="toLabel" for="to">IC</label><input id="to" type="number" min="0" step="any" placeholder="Result" inputmode="decimal"></div>
+    </div>
+    <div class="result"><small id="resultLabel">Conversion result</small><div id="answer">-</div></div>
+    <section class="ledger">
+      <h2>Add or subtract from account</h2>
+      <div class="entry-fields">
+        <div><label for="person">Person name</label><input id="person" type="text" placeholder="Enter name"></div>
+        <div><label for="particular">Particular / details</label><input id="particular" type="text" placeholder="Example: goods purchased"></div>
+        <div><label for="entryDate">Date</label><input id="entryDate" type="date"></div>
+      </div>
+      <div class="ledger-actions"><button class="action" id="add" type="button">+ Add to account</button><button class="action minus" id="subtract" type="button">- Subtract from account</button><button class="action clear" id="clear" type="button">Clear account</button><button class="action" id="downloadPdf" type="button">Download PDF</button></div>
+      <div class="total"><span>Account total</span><span id="total">0.00 NPR</span></div>
+      <table class="entries" aria-label="Account entries"><thead><tr><th>Date</th><th>Name</th><th>Particular</th><th>Amount</th></tr></thead><tbody id="entryList"><tr id="emptyRow"><td colspan="4">There are no entries yet.</td></tr></tbody></table>
+    </section>
+    <p class="hint">To change the rate, enter a new value in the “1 IC equals NPR” field above.</p>
+  </section>
+</main>
+<script>
+const rate=document.querySelector('#rate'),from=document.querySelector('#from'),to=document.querySelector('#to');
+const answer=document.querySelector('#answer'),fromLabel=document.querySelector('#fromLabel'),toLabel=document.querySelector('#toLabel'),resultLabel=document.querySelector('#resultLabel');
+const person=document.querySelector('#person'),particular=document.querySelector('#particular'),entryDate=document.querySelector('#entryDate'),entryList=document.querySelector('#entryList');
+let mode='npr',totalNpr=0;
+entryDate.value=new Date().toLocaleDateString('en-CA');
+const fmt=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:4}).format(n);
+const money=n=>new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+function showTotal(){document.querySelector('#total').textContent=`${money(totalNpr)} NPR`}
+function convert(source){const r=Number(rate.value),v=Number(source.value);if(!r||r<=0||source.value===''||Number.isNaN(v)){answer.textContent='-';if(source===from)to.value='';else from.value='';return}const sourceIsNpr=source===from?mode==='npr':mode!=='npr';const out=sourceIsNpr?v/r:v*r;(source===from?to:from).value=out.toFixed(4).replace(/\.?0+$/,'');const unit=sourceIsNpr?'IC':'NPR';answer.textContent=`${fmt(out)} ${unit}`;resultLabel.textContent=`${fmt(v)} ${sourceIsNpr?'NPR':'IC'} equals`}
+from.addEventListener('input',()=>convert(from));to.addEventListener('input',()=>convert(to));rate.addEventListener('input',()=>convert(document.activeElement===to?to:from));
+document.querySelector('#swap').addEventListener('click',()=>{mode=mode==='npr'?'ic':'npr';[from.value,to.value]=[to.value,from.value];[fromLabel.textContent,toLabel.textContent]=[toLabel.textContent,fromLabel.textContent];from.placeholder=mode==='ic'?'Enter IC amount':'Enter amount';to.placeholder=mode==='ic'?'NPR result':'Result';convert(from)});
+function currentNpr(){const v=Number(from.value),r=Number(rate.value);if(from.value===''||!r||r<=0||Number.isNaN(v))return null;return mode==='npr'?v:v*r}
+function addEntry(amount,kind){document.querySelector('#emptyRow')?.remove();const tr=document.createElement('tr');const shownDate=entryDate.value?new Date(`${entryDate.value}T00:00:00`).toLocaleDateString('en-GB'):'-';tr.innerHTML=`<td>${shownDate}</td><td>${person.value.trim()||'-'}</td><td>${particular.value.trim()||'-'}</td><td class="${kind==='add'?'add-row':'minus-row'}">${kind==='add'?'+':'-'} ${money(amount)} NPR</td>`;entryList.prepend(tr);particular.value=''}
+document.querySelector('#add').addEventListener('click',()=>{const n=currentNpr();if(n!==null){totalNpr+=n;showTotal();addEntry(n,'add')}});document.querySelector('#subtract').addEventListener('click',()=>{const n=currentNpr();if(n!==null){totalNpr-=n;showTotal();addEntry(n,'minus')}});document.querySelector('#clear').addEventListener('click',()=>{totalNpr=0;entryList.innerHTML='<tr id="emptyRow"><td colspan="4">There are no entries yet.</td></tr>';showTotal()});showTotal();
+function pdfEscape(text){return String(text).replace(/[\\()]/g,'\\$&').replace(/[^\x20-\x7E]/g,'?')}
+function reportLines(){const rows=[...entryList.querySelectorAll('tr')].filter(row=>row.id!=='emptyRow');const lines=['ACCOUNT REPORT',`Generated: ${new Date().toLocaleString('en-GB')}`,`Account total: ${money(totalNpr)} NPR`,'','Date | Name | Particular | Amount','----------------------------------------------------------'];if(!rows.length)lines.push('There are no entries yet.');rows.reverse().forEach(row=>{const cells=[...row.cells].map(cell=>cell.textContent.trim());const record=`${cells[0]} | ${cells[1]} | ${cells[2]} | ${cells[3]}`;for(let i=0;i<record.length;i+=82)lines.push(record.slice(i,i+82))});return lines}
+function downloadPdf(){const lines=reportLines(),perPage=48,chunks=[];for(let i=0;i<lines.length;i+=perPage)chunks.push(lines.slice(i,i+perPage));const objects=[];const pageRefs=chunks.map((_,i)=>`${4+i*2} 0 R`);objects[1]='<< /Type /Catalog /Pages 2 0 R >>';objects[2]=`<< /Type /Pages /Kids [${pageRefs.join(' ')}] /Count ${chunks.length} >>`;objects[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';chunks.forEach((chunk,i)=>{const page=4+i*2,content=page+1;const stream=['BT','/F1 18 Tf','42 806 Td','(Account Report) Tj','/F1 10 Tf'];chunk.slice(1).forEach((line,index)=>stream.push(`1 0 0 1 42 ${782-index*15} Tm (${pdfEscape(line)}) Tj`));const data=stream.concat(['ET']).join('\n');objects[page]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents '+content+' 0 R >>';objects[content]=`<< /Length ${new TextEncoder().encode(data).length} >>\nstream\n${data}\nendstream`});let pdf='%PDF-1.4\n',offsets=[0];for(let i=1;i<objects.length;i++){offsets[i]=new TextEncoder().encode(pdf).length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}const xref=new TextEncoder().encode(pdf).length;pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;for(let i=1;i<objects.length;i++)pdf+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;pdf+=`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([pdf],{type:'application/pdf'}));link.download=`account-report-${new Date().toISOString().slice(0,10)}.pdf`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000)}
+document.querySelector('#downloadPdf').addEventListener('click',downloadPdf);
+</script>
+</body>
+</html>
